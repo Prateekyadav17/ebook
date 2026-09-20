@@ -728,53 +728,22 @@
     });
 
     // =========================================================================
-    // 3. RAZORPAY STANDARD CHECKOUT INTEGRATION (OPTION A)
+    // 3. RAZORPAY CHECKOUT INTEGRATION
     // =========================================================================
-    // Replace with your Razorpay Key ID from https://dashboard.razorpay.com/app/keys:
-    const RAZORPAY_KEY_ID = "rzp_test_YOUR_KEY_HERE";
+    // If you have a Razorpay Key ID (rzp_live_... or rzp_test_...), paste it here:
+    const RAZORPAY_KEY_ID = "";
 
     const razorpayBtn = document.getElementById('btn-razorpay-checkout');
     if (razorpayBtn) {
       razorpayBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-
         const savedKey = localStorage.getItem('gfh_razorpay_key') || RAZORPAY_KEY_ID;
 
-        // If key is not yet configured, provide seamless options
-        if (!savedKey || savedKey === 'rzp_test_YOUR_KEY_HERE') {
-          const userChoice = prompt(
-            "Razorpay Standard Checkout Setup:\n\n" +
-            "• Enter your Razorpay Key ID (rzp_live_... or rzp_test_...)\n" +
-            "• OR type 'me' to open your direct Razorpay.me page\n" +
-            "• OR press OK to simulate a real payment & generate your invoice:",
-            ""
-          );
-
-          if (userChoice === null) return; // cancelled
-
-          const trimmed = userChoice.trim();
-          if (trimmed.toLowerCase() === 'me') {
-            window.open('https://razorpay.me/@prateekyadav4355', '_blank');
-            return;
-          } else if (trimmed.startsWith('rzp_')) {
-            localStorage.setItem('gfh_razorpay_key', trimmed);
-            initiateRazorpayCheckout(trimmed);
-            return;
-          } else {
-            // Instant realistic simulation with real format payment ID
-            const simPaymentId = 'pay_' + Math.random().toString(36).substring(2, 8).toUpperCase() + Math.floor(1000000 + Math.random() * 9000000);
-            const params = new URLSearchParams({
-              payment_id: simPaymentId,
-              amount: '99',
-              name: trimmed || 'Prateek VIP Reader',
-              date: new Date().toISOString()
-            });
-            window.location.href = `./thankyou.html?${params.toString()}`;
-            return;
-          }
+        // If a valid Razorpay API key is set, use in-page checkout popup
+        if (savedKey && savedKey.startsWith('rzp_')) {
+          e.preventDefault();
+          initiateRazorpayCheckout(savedKey);
         }
-
-        initiateRazorpayCheckout(savedKey);
+        // Otherwise, allow default <a> link action to open razorpay.me page directly!
       });
     }
 
